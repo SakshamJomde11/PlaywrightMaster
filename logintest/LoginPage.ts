@@ -22,7 +22,7 @@ export class LoginPage {
     this.loginButton = page.getByRole('button', { name: 'Login' });
     this.errorMessage = page.getByText('Invalid credentials');
     this.dashboardHeader = page.getByRole('heading', { name: 'Dashboard' });
-    this.userMenu = page.getByText('NtEjDwiqnQ user');
+    this.userMenu = page.getByText('VynWvMyhmk Garzon');
     this.logoutButton = page.getByRole('menuitem', { name: 'Logout' });
   }
 
