@@ -1,46 +1,65 @@
-import{Locator, Page} from '@playwright/test';
+// pages/login.page.ts
+import { Page, Locator } from '@playwright/test';
 
-export class LoginPage{
+export class LoginPage {
+  private readonly page: Page;
 
-    private page:Page;
-    private usernameInput:Locator;
-    private passwordInput:Locator;
-    private loginButton:Locator;
+  // Locators
+  readonly usernameInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
+  readonly errorMessage: Locator;
+  readonly dashboardHeader: Locator;
+  readonly userMenu: Locator;
+  readonly logoutButton: Locator;
 
-    constructor(page:Page){
-        this.page = page;
+  constructor(page: Page) {
+    this.page = page;
     
+    // Initialize locators
+    this.usernameInput = page.getByPlaceholder('Username');
+    this.passwordInput = page.getByPlaceholder('Password');
+    this.loginButton = page.getByRole('button', { name: 'Login' });
+    this.errorMessage = page.getByText('Invalid credentials');
+    this.dashboardHeader = page.getByRole('heading', { name: 'Dashboard' });
+    this.userMenu = page.getByText('NtEjDwiqnQ user');
+    this.logoutButton = page.getByRole('menuitem', { name: 'Logout' });
+  }
 
-    // Using `getByTestId` for selectors
-    this.usernameInput = page.locator('id=Email');
-    this.passwordInput = page.locator('id=Password');
-    this.loginButton = page.locator('id=btn-login');
-    }
+  // Page actions
+  async navigateToLoginPage(url: string) {
+    await this.page.goto(url);
+  }
 
-    async navigate() {
-    await this.page.goto('https://qaexchange.truefill.com/'); // Update with the actual login route
-    }
+  async enterUsername(username: string) {
+    await this.usernameInput.click();
+    await this.usernameInput.fill(username);
+  }
 
-    async enterEmail(email: string) {
-    await this.usernameInput.fill(email);
-    }
-
-    async enterPassword(password: string) {
+  async enterPassword(password: string) {
+    await this.passwordInput.click();
     await this.passwordInput.fill(password);
-    }
+  }
 
-    async clickLoginButton() {
+  async clickLogin() {
     await this.loginButton.click();
-    }
+  }
 
-    async getErrorMessage(): Promise<string> {
-        const text = await this.page.locator('.msgText').textContent();
-        return text ?? ''; // If null, default to an empty string
-    }
-      
-   
-   
+  async performLogin(username: string, password: string) {
+    await this.enterUsername(username);
+    await this.enterPassword(password);
+    await this.clickLogin();
+  }
+
+  async logout() {
+    await this.userMenu.click();
+    await this.logoutButton.click();
+  }
+
+  async getRequiredFields() {
+    return {
+      usernameRequired: this.page.getByText('Required').first(),
+      passwordRequired: this.page.getByText('Required').nth(1)
+    };
+  }
 }
-
-
-    

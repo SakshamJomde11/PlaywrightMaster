@@ -6,25 +6,26 @@ test.describe('Login Tests', () => {
 
   test.beforeEach(async ({ page }) => {
     loginPage = new LoginPage(page);
-    await loginPage.navigate(   );
+    await loginPage.navigateToLoginPage('https://opensource-demo.orangehrmlive.com/web/index.php/auth/login');
   });
 
-  test('should login successfully with valid credentials', async ({ page }) => {
-    await loginPage.enterEmail('tfxtest+truefillsupplieron1@titancloud.com');
-    await loginPage.enterPassword('Tfx@2023');
-    await loginPage.clickLoginButton();
-
-    // Verify successful login
-    await expect(page).toHaveURL('https://qaexchange.truefill.com/Supplier/Dashboard/New'); // Adjust the URL as needed
+  test('Invalid login attempt', async () => {
+    await loginPage.performLogin('Admin', 'admin12');
+    await expect(loginPage.errorMessage).toBeVisible();
   });
 
-  test('should show an error message with invalid credentials', async ({ page }) => {
-    await loginPage.enterEmail('tfxtest+truefillsupplieron1@truefill.com');
-    await loginPage.enterPassword('Tfx@s2023');
-    await loginPage.clickLoginButton();
+  test('Empty field validation', async () => {
+    await loginPage.clickLogin();
+    const requiredFields = await loginPage.getRequiredFields();
+    await expect(requiredFields.usernameRequired).toBeVisible();
+    await expect(requiredFields.passwordRequired).toBeVisible();
+  });
 
-    // Verify error message
-    const errorMessage = await loginPage.getErrorMessage();
-    expect(errorMessage).toContain("The email that you've entered doesn't match any account."); // Adjust message as needed
+  test('Successful login and logout', async () => {
+    await loginPage.performLogin('Admin', 'admin123');
+    await expect(loginPage.dashboardHeader).toBeVisible();
+    
+    await loginPage.logout();
+    await expect(loginPage.usernameInput).toBeVisible();
   });
 });
