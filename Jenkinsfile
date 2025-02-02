@@ -29,7 +29,7 @@ pipeline {
       steps {
         script {
           docker.image("${DOCKER_IMAGE}").run('--ipc=host -e API_KEY=${API_KEY}').inside {
-            sh 'npx playwright test --workers=4'
+            bat 'npx playwright test --workers=4'
           }
         }
       }
@@ -52,7 +52,7 @@ pipeline {
                to: 'jomdesaksham2@gmail.com'
       script {
         node{
-                  sh 'docker system prune -f'
+              bat 'docker system prune -f'
         }
       }
     }
