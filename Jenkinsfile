@@ -41,7 +41,7 @@ pipeline {
     always {
       emailext body: 'Tests completed. Check report at ${BUILD_URL}artifact/playwright-report/index.html',
                subject: 'Playwright Tests: ${BUILD_STATUS}',
-               to: 'your-email@example.com'
+               to: 'jomdesaksham2@gmail.com'
     }
   }
 }
