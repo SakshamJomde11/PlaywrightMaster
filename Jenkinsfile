@@ -1,79 +1,72 @@
 pipeline {
-  agent any
-  options {
-    timeout(time: 30, unit: 'MINUTES')
-  }
-
-  environment {
-    DOCKER_IMAGE = 'playwright-auto'
-    API_KEY_CREDENTIAL_ID = credentials('sakshamjomde11cred')
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        git branch: 'main', 
-        url: 'https://github.com/SakshamJomde11/PlaywrightMaster.git'
-      }
+    agent any
+    options {
+        timeout(time: 30, unit: 'MINUTES')
     }
 
+    environment {
+        DOCKER_IMAGE = 'playwright-auto'
+        API_KEY_CREDENTIAL_ID = credentials('sakshamjomde11cred')
+    }
 
     stages {
-    stage('Cleanup Docker') {   // Added Cleanup Stage
-        steps {
-            script {
-                bat 'docker system prune -a --volumes -f'
+        stage('Checkout') {
+            steps {
+                git branch: 'main', 
+                url: 'https://github.com/SakshamJomde11/PlaywrightMaster.git'
+            }
+        }
+
+        stage('Cleanup Docker') {   // Cleanup stage to avoid old/corrupt images
+            steps {
+                script {
+                    bat 'docker system prune -a --volumes -f'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${DOCKER_IMAGE}", "-f Dockerfile .")
+                }
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                script {
+                    docker.image("${DOCKER_IMAGE}").inside(
+                        "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
+                        "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +
+                        "-w /workspace"
+                    ) {
+                        bat 'npx playwright test --workers=4'
+                    }
+                }
+            }
+        }
+
+        stage('Publish Report') {
+            steps {
+                allure includeProperties: false,
+                       jdk: '',
+                       results: [[path: 'allure-results']]
+                archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
             }
         }
     }
 
-    stage('Build Docker Image') {
-        steps {
+    post {
+        always {
+            emailext body: 'Tests completed. Check report at ${BUILD_URL}artifact/playwright-report/index.html',
+                     subject: 'Playwright Tests: ${BUILD_STATUS}',
+                     to: 'jomdsaksham2@gmail.com'
             script {
-                docker.build("${DOCKER_IMAGE}", "-f Dockerfile .")
+                node {
+                    bat 'docker system prune -a --volumes -f'
+                }
             }
         }
     }
-}
-
-
-
-
-      stage('Run Tests') {
-          steps {
-              script {
-                  docker.image("${DOCKER_IMAGE}").inside(
-                      "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                      "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +
-                      "-w /workspace"
-                  ) {
-                      bat 'npx playwright test --workers=4'
-                  }
-              }
-          }
-      }
-
-
-    stage('Publish Report') {
-      steps {
-        allure includeProperties: false,
-               jdk: '',
-               results: [[path: 'allure-results']]
-        archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
-      }
-    }
-  }
-
-  post {
-    always {
-      emailext body: 'Tests completed. Check report at ${BUILD_URL}artifact/playwright-report/index.html',
-               subject: 'Playwright Tests: ${BUILD_STATUS}',
-               to: 'jomdsaksham2@gmail.com'
-      script {
-        node{
-              bat 'docker system prune -a --volumes -f'
-        }
-      }
-    }
-  }
 }
