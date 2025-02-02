@@ -25,19 +25,17 @@ pipeline {
       }
     }
 
-stage('Run Tests') {
-    steps {
-        script {
-            docker.image("${DOCKER_IMAGE}").run(
-                "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +
-                "-w /workspace"
-            ) {
-                bat 'npx playwright test --workers=4'
+        stage('Run Tests') {
+            steps {
+                script {
+                    // Run the Docker container with the necessary options
+                    docker.image("${DOCKER_IMAGE}").inside("--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID}") {
+                        // Run your tests inside the container
+                        bat 'npx playwright test --workers=4'
+                    }
+                }
             }
         }
-    }
-}
 
     stage('Publish Report') {
       steps {
