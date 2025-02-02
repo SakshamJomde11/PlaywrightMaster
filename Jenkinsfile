@@ -25,13 +25,13 @@ pipeline {
       }
     }
 
-  stage('Run Tests') {
+stage('Run Tests') {
     steps {
         script {
             docker.image("${DOCKER_IMAGE}").run(
                 "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                "-v ${WORKSPACE}:${WORKSPACE} " +  // Use the correct path here
-                "-w ${WORKSPACE}"
+                "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +
+                "-w /workspace"
             ) {
                 bat 'npx playwright test --workers=4'
             }
