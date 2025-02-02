@@ -38,7 +38,7 @@ pipeline {
                 script {
                     docker.image("${DOCKER_IMAGE}").inside(
                         "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                        "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +
+                        "-v ${env.WORKSPACE}:/workspace " +
                         "-w /workspace"
                     ) {
                         bat 'npx playwright test --workers=4'
