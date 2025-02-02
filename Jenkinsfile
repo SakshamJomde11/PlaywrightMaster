@@ -26,17 +26,17 @@ pipeline {
     }
 
     stage('Run Tests') {
-        steps {
-            script {
-                docker.image("${DOCKER_IMAGE}").inside(
-                    "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                    "-v /c/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests:/workspace " +  // Correct volume mapping
-                    "-w /workspace"  // Correct working directory inside container
-                ) {
-                    bat 'npx playwright test --workers=4'
-                }
-            }
+      steps {
+        script {
+          def workspacePath = env.WORKSPACE.replace('/', '\\')
+          docker.image("${DOCKER_IMAGE}").run(
+            '--ipc=host',
+            "-v", "${workspacePath}:C:\\app"
+          ).inside {
+            bat 'npx playwright test'
+          }
         }
+      }
     }
 
     stage('Publish Report') {
