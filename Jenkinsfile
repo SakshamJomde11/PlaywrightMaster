@@ -6,7 +6,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = 'playwright-auto'
-    API_KEY_CREDENTIAL_ID = credentials('sakshamjomde11')
+    API_KEY_CREDENTIAL_ID = credentials('sakshamjomde11cred')
   }
 
   stages {
