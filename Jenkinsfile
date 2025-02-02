@@ -19,7 +19,7 @@ pipeline {
 
 
     stages {
-    stage('Cleanup Docker') {   // 🧹 Added Cleanup Stage
+    stage('Cleanup Docker') {   // Added Cleanup Stage
         steps {
             script {
                 bat 'docker system prune -a --volumes -f'
@@ -37,13 +37,7 @@ pipeline {
 }
 
 
-    stage('Build Docker Image') {
-      steps {
-        script {
-          docker.build("${DOCKER_IMAGE}", "-f Dockerfile .")
-        }
-      }
-    }
+
 
       stage('Run Tests') {
           steps {
