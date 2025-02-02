@@ -25,19 +25,22 @@ pipeline {
       }
     }
 
-    stage('Run Tests') {
-      steps {
-        script {
-          def workspacePath = env.WORKSPACE.replace('/', '\\')
-          docker.image("${DOCKER_IMAGE}").run(
-            '--ipc=host',
-            "-v", "${workspacePath}:C:\\app"
-          ).inside {
-            bat 'npx playwright test'
+      stage('Run Tests') {
+          steps {
+              script {
+                  def workspacePath = "C:/ProgramData/Jenkins/.jenkins/workspace/Playwright-Tests"
+                  def dockerWorkspacePath = "/workspace"  // Use a Unix-style path inside the container
+
+                  docker.image("${DOCKER_IMAGE}").inside(
+                      "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
+                      "-v ${workspacePath.replace('\\', '/')}:/workspace " +  // Convert Windows path to Unix-style
+                      "-w ${dockerWorkspacePath}"  // Use Unix-style path inside container
+                  ) {
+                      bat 'npx playwright test --workers=4'
+                  }
+              }
           }
-        }
       }
-    }
 
     stage('Publish Report') {
       steps {
