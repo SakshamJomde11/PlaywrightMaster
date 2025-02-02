@@ -49,7 +49,7 @@ pipeline {
     always {
       emailext body: 'Tests completed. Check report at ${BUILD_URL}artifact/playwright-report/index.html',
                subject: 'Playwright Tests: ${BUILD_STATUS}',
-               to: 'SakshamJomde11'
+               to: 'jomdsaksham2@gmail.com'
       script {
         node{
               bat 'docker system prune -f'
