@@ -25,15 +25,16 @@ pipeline {
       }
     }
 
-    stage('Run Tests') {
-      steps {
-        script {
-          docker.image("${DOCKER_IMAGE}").run('--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID}').inside {
-            bat 'npx playwright test --workers=4'
+      stage('Run Tests') {
+          steps {
+              script {
+                  // Run tests inside the Docker container using the 'inside' method
+                  docker.image("${DOCKER_IMAGE}").inside("--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID}") {
+                      bat 'npx playwright test --workers=4'
+                  }
+              }
           }
-        }
       }
-    }
 
     stage('Publish Report') {
       steps {
