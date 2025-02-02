@@ -20,11 +20,14 @@ export default defineConfig({
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
   /* Opt out of parallel tests on CI. */
-  workers: process.env.CI ? 2 : undefined, // Reduce workers in CI to avoid flakiness
+  workers: process.env.CI ? 4 : 2, // Reduce workers in CI to avoid flakiness
 
   timeout: 60_000,// Increase timeout for CI
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['html', {outputFolder: 'playwright-report'}],          //Build-in HTML reporter 
+    ['allure-playwright',{outputFolder: 'allure-results'}], // Allure reporter
+  ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */

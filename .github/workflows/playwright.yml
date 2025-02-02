@@ -3,7 +3,11 @@ on: [push, pull_request] # Triggers on code push or PR
 
 jobs:
   test:
-    runs-on: ubuntu-latest # Use GitHub's Ubuntu machine
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{matrix.os}}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,11 +24,30 @@ jobs:
         run: npx playwright install --with-deps # Install browsers like Chromium
 
       - name: Run Playwright tests
-        run: npx playwright test # Run all tests
+        run: npx playwright test --shard =${{ matrix.shard}} # Run all tests
 
       - name: Upload HTML report
-        if: always() # Upload even if tests fail
+        if: always()                        # Upload HTML report even if tests fail
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: playwright-report/
+
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        if: always()                          # Upload HTML report even if tests fail
+        with:
+            name: allure-results
+            path: allure-results/
+
+      - name: Build Docker image
+        run: docker build -t playwright-auto .  # Build docker image
+
+      - name: Run tests in Docker
+        run: docker run paywright-auto          #Run docker image in container 
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with: 
+          name: screenshots
+          path: test-results/
