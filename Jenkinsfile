@@ -51,7 +51,9 @@ pipeline {
                subject: 'Playwright Tests: ${BUILD_STATUS}',
                to: 'jomdesaksham2@gmail.com'
       script {
-        sh 'docker system prune -f'
+        node{
+                  sh 'docker system prune -f'
+        }
       }
     }
   }
