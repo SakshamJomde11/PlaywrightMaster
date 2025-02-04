@@ -17,7 +17,7 @@ pipeline {
             }
         }
 
-        stage('Cleanup Docker') {   // Cleanup stage to avoid old/corrupt images
+        stage('Cleanup Docker') {
             steps {
                 script {
                     bat 'docker system prune -a --volumes -f'
@@ -37,9 +37,7 @@ pipeline {
             steps {
                 script {
                     docker.image("${DOCKER_IMAGE}").inside(
-                        "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID} " +
-                        "-v ${env.WORKSPACE}:/workspace " +
-                        "-w /workspace"
+                        "--ipc=host -e API_KEY=${API_KEY_CREDENTIAL_ID}"
                     ) {
                         bat 'npx playwright test --workers=4'
                     }
