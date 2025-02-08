@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/microsoft/playwright.git'
+                git 'https://github.com/SakshamJomde11/PlaywrightMaster.git'
             }
         }
         stage('Install Dependencies') {
