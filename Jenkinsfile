@@ -32,7 +32,7 @@ pipeline {
       steps {
         script {
           bat """
-            docker run --rm --ipc=host -v %CD%/playwright-report:/app/playwright-report %DOCKER_IMAGE% bash -c "npx playwright test"
+            docker run --rm --ipc=host -v %CD%/playwright-report:/app/playwright-report %DOCKER_IMAGE%
           """
         }
       }
