@@ -31,7 +31,7 @@ pipeline {
     stage('Run Tests') {
     steps {
         script {
-        docker.image("${DOCKER_IMAGE}").run('--ipc=host npx playwright test')
+        bat 'docker run --ipc=host playwright-auto npx playwright test'
         }
     }
     }
