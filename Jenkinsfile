@@ -23,22 +23,32 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          docker.build("${DOCKER_IMAGE}")
+          bat "docker build -t ${DOCKER_IMAGE} ."
+        }
+      }
+    }
+
+    stage('Verify Playwright Installation') {  // ✅ NEW STEP
+      steps {
+        script {
+          bat "docker run --ipc=host ${DOCKER_IMAGE} npx playwright --version"
         }
       }
     }
 
     stage('Run Tests') {
-    steps {
+      steps {
         script {
-        bat 'docker run --ipc=host playwright-auto bash -c "npx playwright test"'
+          bat "docker run --ipc=host -v %CD%/playwright-report:/app/playwright-report ${DOCKER_IMAGE} bash -c 'npx playwright test'"
         }
-    }
+      }
     }
 
     stage('Publish Report') {
       steps {
-        archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
+        script {
+          archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
+        }
       }
     }
   }
