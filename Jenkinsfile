@@ -23,7 +23,8 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          bat "docker build -t ${DOCKER_IMAGE} ."
+          // Rebuild Docker image to ensure latest dependencies
+          bat 'docker build --no-cache -t playwright-auto .'
         }
       }
     }
@@ -31,7 +32,8 @@ pipeline {
     stage('Verify Playwright Installation') {
       steps {
         script {
-          bat "docker run --ipc=host ${DOCKER_IMAGE} npx playwright --version"
+          // Check if Playwright is installed inside the container
+          bat 'docker run --ipc=host playwright-auto npx playwright --version'
         }
       }
     }
@@ -39,16 +41,14 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          bat "docker run --ipc=host -v %CD%/playwright-report:/app/playwright-report ${DOCKER_IMAGE} bash -c 'npx playwright test'"
+          bat 'docker run --ipc=host playwright-auto bash -c "npx playwright test"'
         }
       }
     }
 
     stage('Publish Report') {
       steps {
-        script {
-          archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
-        }
+        archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
       }
     }
   }

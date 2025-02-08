@@ -11,11 +11,14 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 
 # Install npm dependencies (ensures Playwright is installed)
-RUN npm install
+RUN npm ci
 RUN npx playwright install --with-deps
 
 # Copy all other files
 COPY . .
 
-# Default command
+# Verify Playwright installation inside the container
+RUN npx playwright --version
+
+# Default command (optional)
 CMD ["npx", "playwright", "test"]
