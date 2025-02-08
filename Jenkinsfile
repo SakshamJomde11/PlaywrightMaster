@@ -15,7 +15,7 @@ pipeline {
     stage('Check Docker Access') {
       steps {
         script {
-          sh 'docker ps'
+          bat 'docker ps'
         }
       }
     }
@@ -32,7 +32,7 @@ pipeline {
       steps {
         script {
           docker.image("${DOCKER_IMAGE}").run('--ipc=host').inside {
-            sh 'npx playwright test'
+            bat 'npx playwright test'
           }
         }
       }
