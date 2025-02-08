@@ -1,21 +1,22 @@
-# Use Playwright base image
-FROM mcr.microsoft.com/playwright:v1.50.0-jammy
+FROM mcr.microsoft.com/playwright:v1.40.0-focal
 
 # Set working directory
 WORKDIR /app
 
 # Copy package.json and package-lock.json first
-COPY package*.json ./
+COPY package.json package-lock.json ./
 
-# Install npm dependencies (ensures Playwright is installed)
-RUN npm ci
+# Install dependencies
+RUN npm install
+
+# Install Playwright with dependencies
 RUN npx playwright install --with-deps
 
-# Copy all other files
+# Copy the rest of the project files
 COPY . .
 
-# Verify Playwright installation
+# Check if Playwright is installed properly
 RUN npx playwright --version
 
 # Default command
-CMD ["npx", "playwright", "test"]
+CMD ["npx", "playwright", "--version"]
