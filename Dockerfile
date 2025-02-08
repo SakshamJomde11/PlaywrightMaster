@@ -1,17 +1,20 @@
-# Use the Playwright base image
+# Use the official Playwright image as the base
 FROM mcr.microsoft.com/playwright:v1.50.0-jammy
 
-# Set working directory inside the container
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first
+# Copy package.json and package-lock.json first (for efficient caching)
 COPY package*.json ./
 
-# Install dependencies, including Playwright
-RUN npm ci
+# Install Node.js dependencies (this includes Playwright if it's in package.json)
+RUN npm install
 
-# Copy the rest of your project files
+# Copy the rest of the project files
 COPY . .
 
-# Install Playwright Browsers
+# Ensure Playwright is installed inside the image
 RUN npx playwright install --with-deps
+
+# Set default command (optional)
+CMD ["npx", "playwright", "test"]
