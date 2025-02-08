@@ -12,14 +12,6 @@ pipeline {
       }
     }
 
-    stage('Check Docker Access') {
-      steps {
-        script {
-          bat 'docker ps'
-        }
-      }
-    }
-
     stage('Build Docker Image') {
       steps {
         script {

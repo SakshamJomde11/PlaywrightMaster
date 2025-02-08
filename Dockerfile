@@ -16,5 +16,5 @@ RUN npx playwright install --with-deps
 # Copy the rest of the project files
 COPY . .
 
-# Set entrypoint (default command)
-ENTRYPOINT ["npx", "playwright", "test"]
+# Set entrypoint (use playwright directly, not npx)
+CMD ["npx", "playwright", "test"]
