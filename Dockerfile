@@ -1,5 +1,5 @@
 # Use Playwright base image (latest recommended version)
-FROM mcr.microsoft.com/playwright:v1.50.1-jammy
+FROM mcr.microsoft.com/playwright:v1.50.0-jammy
 
 # Set working directory
 WORKDIR /app
@@ -17,4 +17,4 @@ RUN npx playwright install --with-deps
 COPY . .
 
 # Set entrypoint (default command)
-ENTRYPOINT ["npx", "playwright", "test"]
+ENTRYPOINT ["npx", "playwright","test"]
