@@ -14,6 +14,9 @@ COPY package*.json ./
 RUN npm ci
 RUN npx playwright install --with-deps
 
+# Verify Playwright installation inside the container
+RUN npx playwright --version
+
 # Copy all other files
 COPY . .
 
