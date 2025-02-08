@@ -1,49 +1,21 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    DOCKER_IMAGE = 'playwright-auto'
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        git branch: 'main', url: 'https://github.com/SakshamJomde11/PlaywrightMaster.git'
-      }
-    }
-
-    stage('Build Docker Image') {
-      steps {
-        script {
-          bat 'docker build --no-cache -t %DOCKER_IMAGE% .'
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/microsoft/playwright.git'
+            }
         }
-      }
-    }
-
-    stage('Run Tests') {
-      steps {
-        script {
-          bat 'docker run --rm --ipc=host %DOCKER_IMAGE%'
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
         }
-      }
+        stage('Run Playwright Tests') {
+            steps {
+                sh 'npx playwright test'
+            }
+        }
     }
-
-    stage('Publish Report') {
-      steps {
-        archiveArtifacts artifacts: 'playwright-report/**/*', allowEmptyArchive: true
-      }
-    }
-  }
-
-  post {
-    always {
-      script {
-        emailext(
-          subject: "Playwright Tests: ${currentBuild.currentResult}",
-          body: "Tests completed. Check the report at ${BUILD_URL}artifact/playwright-report/index.html",
-          to: 'jomdesaksham2@gmail.com'
-        )
-      }
-    }
-  }
 }

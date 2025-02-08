@@ -1,4 +1,5 @@
 name: Playwright Tests
+
 on: [push, pull_request] # Triggers on code push or PR
 
 jobs:
@@ -6,7 +7,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-    runs-on: ${{matrix.os}}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout code
@@ -24,7 +25,7 @@ jobs:
         run: npx playwright install --with-deps # Install browsers like Chromium
 
       - name: Run Playwright tests
-        run: npx playwright test --shard =${{ matrix.shard}} # Run all tests
+        run: npx playwright test --shard=${{ matrix.shard }} # Run all tests
 
       - name: Upload HTML report
         if: always()                        # Upload HTML report even if tests fail
@@ -35,19 +36,29 @@ jobs:
 
       - name: Upload Allure Results
         uses: actions/upload-artifact@v4
-        if: always()                          # Upload HTML report even if tests fail
+        if: always()                          # Upload Allure report even if tests fail
         with:
-            name: allure-results
-            path: allure-results/
+          name: allure-results
+          path: allure-results/
 
       - name: Build Docker image
         run: docker build -t playwright-auto .  # Build docker image
 
       - name: Run tests in Docker
-        run: docker run paywright-auto          #Run docker image in container 
+        run: docker run playwright-auto          # Run docker image in container 
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload failure screenshots
+        uses: actions/upload-artifact@v4
         if: failure()
         with: 
           name: screenshots
           path: test-results/
+
+  trigger-jenkins:
+    needs: test # Run only after tests complete
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Jenkins Job
+        run: |
+          curl -X POST http://YOUR_JENKINS_URL/job/YOUR_JOB_NAME/build?token=YOUR_SECRET_TOKEN
