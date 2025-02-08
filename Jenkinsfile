@@ -20,31 +20,21 @@ pipeline {
       }
     }
 
-    // stage('Build Docker Image') {
-    //   steps {
-    //     script {
-    //       // Rebuild Docker image to ensure latest dependencies
-    //       bat 'docker build --no-cache -t playwright-auto .'
-    //     }
-    //   }
-    // }
-
-    // stage('Verify Playwright Installation') {
-    //   steps {
-    //     script {
-    //       // Check if Playwright is installed inside the container
-    //       bat 'docker run --ipc=host playwright-auto npx playwright --version'
-    //     }
-    //   }
-    // }
+    stage('Build Docker Image') {
+      steps {
+        script {
+          bat 'docker build --no-cache -t ${DOCKER_IMAGE} .'
+        }
+      }
+    }
 
     stage('Run Tests') {
       steps {
         script {
-          bat 'docker build --no-cache -t playwright-auto .'
-          bat 'docker run -it --rm playwright-auto /bin/bash'
-          bat 'docker run --ipc=host playwright-auto npx playwright --version'
-          bat 'docker run --ipc=host playwright-auto bash -c "npx playwright test"'
+          // Run Playwright tests and store reports inside "playwright-report"
+          bat """
+            docker run --rm --ipc=host -v %CD%/playwright-report:/app/playwright-report ${DOCKER_IMAGE} bash -c "npx playwright test"
+          """
         }
       }
     }
@@ -58,9 +48,13 @@ pipeline {
 
   post {
     always {
-      emailext body: 'Tests completed. Check report at ${BUILD_URL}artifact/playwright-report/index.html',
-               subject: 'Playwright Tests: ${BUILD_STATUS}',
-               to: 'jomdesaksham2@gmail.com'
+      script {
+        emailext(
+          subject: "Playwright Tests: ${currentBuild.currentResult}",
+          body: "Tests completed. Check the report at ${BUILD_URL}artifact/playwright-report/index.html",
+          to: 'jomdesaksham2@gmail.com'
+        )
+      }
     }
   }
 }
