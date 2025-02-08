@@ -4,14 +4,15 @@ FROM mcr.microsoft.com/playwright:v1.50.0-jammy
 # Set working directory inside container
 WORKDIR /app
 
-# Copy package.json and package-lock.json first to install dependencies
+# Ensure system dependencies are installed
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Copy package.json and package-lock.json first
 COPY package*.json ./
 
-# Install npm dependencies
-RUN npm install  # Use npm install instead of npm ci
-
-# Ensure Playwright is installed along with dependencies
-RUN npx playwright install --with-deps || echo "Playwright install failed"
+# Install npm dependencies (ensures Playwright is installed)
+RUN npm install
+RUN npx playwright install --with-deps
 
 # Copy all other files
 COPY . .
