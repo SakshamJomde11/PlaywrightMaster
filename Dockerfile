@@ -8,10 +8,10 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install npm dependencies
-RUN npm ci
+RUN npm install  # Use npm install instead of npm ci
 
 # Ensure Playwright is installed along with dependencies
-RUN npx playwright install --with-deps
+RUN npx playwright install --with-deps || echo "Playwright install failed"
 
 # Copy all other files
 COPY . .

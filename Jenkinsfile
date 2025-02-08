@@ -28,7 +28,7 @@ pipeline {
       }
     }
 
-    stage('Verify Playwright Installation') {  // ✅ NEW STEP
+    stage('Verify Playwright Installation') {
       steps {
         script {
           bat "docker run --ipc=host ${DOCKER_IMAGE} npx playwright --version"
