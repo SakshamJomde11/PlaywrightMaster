@@ -42,7 +42,7 @@ pipeline {
       steps {
         script {
           bat 'docker build --no-cache -t playwright-auto .'
-          bat 'docker run --rm playwright-auto'
+          bat 'docker run -it --rm playwright-auto /bin/bash'
           bat 'docker run --ipc=host playwright-auto npx playwright --version'
           bat 'docker run --ipc=host playwright-auto bash -c "npx playwright test"'
         }
