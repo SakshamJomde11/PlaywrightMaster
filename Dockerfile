@@ -17,8 +17,5 @@ RUN npx playwright install --with-deps
 # Copy all other files
 COPY . .
 
-# Verify Playwright installation inside the container
-RUN npx playwright --version
-
 # Default command (optional)
 CMD ["npx", "playwright", "test"]
