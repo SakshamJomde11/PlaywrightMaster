@@ -31,9 +31,7 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          bat 'docker build --no-cache -t playwright-auto .'
-          bat 'docker run --rm --ipc=host playwright-auto npx playwright --version'
-          bat 'docker run --rm --ipc=host playwright-auto npx playwright test'
+          bat 'docker run --rm --ipc=host %DOCKER_IMAGE%'
         }
       }
     }

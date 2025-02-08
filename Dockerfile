@@ -17,4 +17,4 @@ RUN npx playwright install --with-deps
 COPY . .
 
 # Set entrypoint (default command)
-ENTRYPOINT ["npx", "playwright","test"]
+ENTRYPOINT ["npx", "playwright", "test"]
