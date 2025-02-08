@@ -23,7 +23,7 @@ pipeline {
     stage('Build Docker Image') {
       steps {
         script {
-          bat 'docker build --no-cache -t ${DOCKER_IMAGE} .'
+          bat 'docker build --no-cache -t %DOCKER_IMAGE% .'
         }
       }
     }
@@ -31,9 +31,8 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          // Run Playwright tests and store reports inside "playwright-report"
           bat """
-            docker run --rm --ipc=host -v %CD%/playwright-report:/app/playwright-report ${DOCKER_IMAGE} bash -c "npx playwright test"
+            docker run --rm --ipc=host -v %CD%/playwright-report:/app/playwright-report %DOCKER_IMAGE% bash -c "npx playwright test"
           """
         }
       }
