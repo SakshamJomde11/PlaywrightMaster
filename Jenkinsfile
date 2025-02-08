@@ -29,13 +29,11 @@ pipeline {
     }
 
     stage('Run Tests') {
-      steps {
+    steps {
         script {
-          docker.image("${DOCKER_IMAGE}").run('--ipc=host').inside {
-            bat 'npx playwright test'
-          }
+        docker.image("${DOCKER_IMAGE}").run('--ipc=host npx playwright test')
         }
-      }
+    }
     }
 
     stage('Publish Report') {
