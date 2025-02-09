@@ -63,9 +63,8 @@ pipeline {
         to: 'jomdesaksham2@gmail.com'
       )
     }
-  }
-
-  post {
+  
+  post 
   failure {
     slackSend channel: '#automation',
               message: "Tests failed: ${BUILD_URL}"
