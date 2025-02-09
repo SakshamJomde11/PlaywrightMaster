@@ -37,11 +37,7 @@ pipeline {
 
     stage('Publish Allure Report') {
       steps {
-        allure([
-          includeProperties: false,
-          jdk: '',
-          results: [[path: 'allure-results']]
-        ])
+        step([$class: 'AllureReportPublisher', results: [[path: 'allure-results']]])
       }
     }
 
@@ -56,17 +52,19 @@ pipeline {
   }
 
   post {
-    always {
-      emailext(
-        subject: "Playwright Tests: ${currentBuild.currentResult}",
-        body: "Check report: ${BUILD_URL}artifact/playwright-report/index.html",
-        to: 'jomdesaksham2@gmail.com'
-      )
-    }
-
-    failure {
-      slackSend channel: '#automation',
-                message: "Tests failed: ${BUILD_URL}"
-    }
+  always {
+    emailext(
+      subject: "Playwright Tests: ${currentBuild.currentResult}",
+      body: "Check report: ${BUILD_URL}artifact/playwright-report/index.html",
+      to: 'jomdesaksham2@gmail.com'
+    )
   }
+  failure {
+        slackSend(
+        channel: '#automation',
+        message: "Tests failed: ${BUILD_URL}",
+        tokenCredentialId: 'slack-token'
+        )
+  }
+}
 }
