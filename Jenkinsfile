@@ -42,12 +42,18 @@ pipeline {
     }
 
     stage('Security Scan') {
-      steps {
-        script {
-          bat 'docker scan playwright-auto'
-          bat 'npm audit'
+        steps {
+            script {
+                // Pull the latest Snyk CLI Docker image
+                bat 'docker pull snyk/snyk-cli'
+
+                // Run Snyk security scan on the Playwright Docker image
+                bat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk-cli test --docker playwright-auto'
+
+                // Run npm audit for package vulnerabilities
+                bat 'npm audit --audit-level=high'
+            }
         }
-      }
     }
   }
 
