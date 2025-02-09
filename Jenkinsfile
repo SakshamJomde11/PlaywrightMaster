@@ -14,11 +14,11 @@ pipeline {
     }
 
     stage('Build Docker Image') {
-    steps {
+      steps {
         script {
-        docker.build("${DOCKER_IMAGE}", "--build-arg NODE_ENV=ci .")
+          docker.build("${DOCKER_IMAGE}", "--build-arg NODE_ENV=ci .")
         }
-    }
+      }
     }
 
     stage('Run Tests') {
@@ -36,22 +36,22 @@ pipeline {
     }
 
     stage('Publish Allure Report') {
-    steps {
+      steps {
         allure([
-        includeProperties: false,
-        jdk: '',
-        results: [[path: 'allure-results']]
+          includeProperties: false,
+          jdk: '',
+          results: [[path: 'allure-results']]
         ])
       }
     }
 
     stage('Security Scan') {
-    steps {
+      steps {
         script {
-        bat 'docker scan playwright-auto'
-        bat 'npm audit'
+          bat 'docker scan playwright-auto'
+          bat 'npm audit'
         }
-    }
+      }
     }
   }
 
@@ -63,11 +63,10 @@ pipeline {
         to: 'jomdesaksham2@gmail.com'
       )
     }
-  
-  post 
-  failure {
-    slackSend channel: '#automation',
-              message: "Tests failed: ${BUILD_URL}"
+
+    failure {
+      slackSend channel: '#automation',
+                message: "Tests failed: ${BUILD_URL}"
+    }
   }
-}
 }
