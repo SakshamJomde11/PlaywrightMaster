@@ -3,7 +3,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = 'playwright-auto'
-    SNYK_TOKEN = credentials('SNYK_TOKEN')  // Use Jenkins credentials for Snyk authentication
+    SNYK_TOKEN = credentials('SNYK_TOKEN')  // Jenkins credentials for Snyk authentication
   }
 
   stages {
@@ -14,18 +14,10 @@ pipeline {
       }
     }
 
-    stage('Install Dependencies') {
-      steps {
-        script {
-          bat 'npm install'  // Install dependencies including Snyk
-        }
-      }
-    }
-
     stage('Build Docker Image') {
       steps {
         script {
-          docker.build("${DOCKER_IMAGE}", "--build-arg NODE_ENV=ci .")
+          docker.build("${DOCKER_IMAGE.toLowerCase()}", "--build-arg NODE_ENV=ci .")
         }
       }
     }
@@ -33,8 +25,13 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-            bat "echo DOCKER_IMAGE=${DOCKER_IMAGE}"
-            bat "docker run --rm --ipc=host ${DOCKER_IMAGE.toLowerCase()}"
+          bat "echo Running tests in Docker container: ${DOCKER_IMAGE.toLowerCase()}"
+          def exitCode = bat(script: "docker run --rm --ipc=host --name playwright-tests -v \"%CD%:/app\" ${DOCKER_IMAGE.toLowerCase()}", returnStatus: true)
+          
+          if (exitCode != 0) {
+            currentBuild.result = 'FAILURE'
+            error("Tests failed inside Docker container.")
+          }
         }
       }
     }
@@ -66,7 +63,7 @@ pipeline {
     always {
       script {
         emailext(
-          subject: "Playwright Tests: ${currentBuild.result ?: 'UNKNOWN'}",
+          subject: "Playwright Test Results: ${currentBuild.result}",
           body: "Check report: ${env.BUILD_URL}artifact/playwright-report/index.html",
           to: 'jomdesaksham2@gmail.com'
         )
