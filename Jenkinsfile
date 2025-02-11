@@ -58,19 +58,14 @@ pipeline {
   }
 
   post {
-  always {
-    emailext(
-      subject: "Playwright Tests: ${currentBuild.currentResult}",
-      body: "Check report: ${BUILD_URL}artifact/playwright-report/index.html",
-      to: 'jomdesaksham2@gmail.com'
-    )
-  }
-  failure {
-        slackSend(
-        channel: '#automation',
-        message: "Tests failed: ${BUILD_URL}",
-        tokenCredentialId: 'slack-token'
+    always {
+      script {
+        emailext(
+          subject: "Playwright Tests: ${currentBuild.result ?: 'UNKNOWN'}",
+          body: "Check report: ${env.BUILD_URL}artifact/playwright-report/index.html",
+          to: 'jomdesaksham2@gmail.com'
         )
+      }
+    }
   }
-}
 }
