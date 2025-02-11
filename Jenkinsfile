@@ -33,7 +33,10 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          docker.image("${DOCKER_IMAGE}").run('--ipc=host')
+          def result = bat(script: "docker run --rm --ipc=host ${DOCKER_IMAGE} npx playwright test", returnStatus: true)
+          if (result != 0) {
+            currentBuild.result = 'UNSTABLE'  // Mark build as UNSTABLE if tests fail
+          }
         }
       }
     }
@@ -64,10 +67,6 @@ pipeline {
   post {
     always {
       script {
-               def result = sh(script: 'npx playwright test', returnStatus: true)
-              if (result != 0) {
-              currentBuild.result = 'FAILURE'
-                }
         emailext(
           subject: "Playwright Tests: ${currentBuild.result ?: 'UNKNOWN'}",
           body: "Check report: ${env.BUILD_URL}artifact/playwright-report/index.html",
