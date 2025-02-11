@@ -53,9 +53,9 @@ pipeline {
     stage('Security Scan') {
       steps {
         script {
-          sh 'npx snyk auth $SNYK_TOKEN'  // Authenticate Snyk
-          sh 'npx snyk test --all-projects --severity-threshold=high'  // Run Snyk scan
-          sh 'npm audit --audit-level=high'  // Run npm audit for vulnerabilities
+          bat 'npx snyk auth $SNYK_TOKEN'  // Authenticate Snyk
+          bat 'npx snyk test --all-projects --severity-threshold=high'  // Run Snyk scan
+          bat 'npm audit --audit-level=high'  // Run npm audit for vulnerabilities
         }
       }
     }
