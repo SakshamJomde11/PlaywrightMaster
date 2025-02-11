@@ -3,6 +3,7 @@ pipeline {
 
   environment {
     DOCKER_IMAGE = 'playwright-auto'
+    SNYK_TOKEN = credentials('SNYK_TOKEN')  // Use Jenkins credentials for Snyk authentication
   }
 
   stages {
@@ -10,6 +11,14 @@ pipeline {
       steps {
         git branch: 'main', 
         url: 'https://github.com/SakshamJomde11/PlaywrightMaster.git'
+      }
+    }
+
+    stage('Install Dependencies') {
+      steps {
+        script {
+          sh 'npm install'  // Install dependencies including Snyk
+        }
       }
     }
 
@@ -42,18 +51,13 @@ pipeline {
     }
 
     stage('Security Scan') {
-        steps {
-            script {
-                // Pull the latest Snyk CLI Docker image
-                bat 'docker pull snyk/snyk-cli'
-
-                // Run Snyk security scan on the Playwright Docker image
-                bat 'docker run --rm -v /var/run/docker.sock:/var/run/docker.sock snyk/snyk-cli test --docker playwright-auto'
-
-                // Run npm audit for package vulnerabilities
-                bat 'npm audit --audit-level=high'
-            }
+      steps {
+        script {
+          sh 'npx snyk auth $SNYK_TOKEN'  // Authenticate Snyk
+          sh 'npx snyk test --all-projects --severity-threshold=high'  // Run Snyk scan
+          sh 'npm audit --audit-level=high'  // Run npm audit for vulnerabilities
         }
+      }
     }
   }
 
