@@ -33,7 +33,8 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          bat 'docker run --rm --ipc=host ${DOCKER_IMAGE}'
+            bat "echo DOCKER_IMAGE=${DOCKER_IMAGE}"
+            bat "docker run --rm --ipc=host ${DOCKER_IMAGE.toLowerCase()}"
         }
       }
     }
