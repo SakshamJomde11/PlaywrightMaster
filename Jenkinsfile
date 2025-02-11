@@ -33,13 +33,7 @@ pipeline {
     stage('Run Tests') {
       steps {
         script {
-          def result = bat(script: """
-            docker run --rm --ipc=host ${DOCKER_IMAGE} npx playwright test
-          """, returnStatus: true)
-
-          if (result != 0) {
-            currentBuild.result = 'UNSTABLE'  // Mark build as UNSTABLE if tests fail
-          }
+          bat 'docker run --rm --ipc=host ${DOCKER_IMAGE}'
         }
       }
     }
