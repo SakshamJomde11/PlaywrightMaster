@@ -64,6 +64,10 @@ pipeline {
   post {
     always {
       script {
+               def result = sh(script: 'npx playwright test', returnStatus: true)
+              if (result != 0) {
+              currentBuild.result = 'FAILURE'
+                }
         emailext(
           subject: "Playwright Tests: ${currentBuild.result ?: 'UNKNOWN'}",
           body: "Check report: ${env.BUILD_URL}artifact/playwright-report/index.html",
