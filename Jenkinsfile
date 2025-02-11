@@ -17,7 +17,7 @@ pipeline {
     stage('Install Dependencies') {
       steps {
         script {
-          sh 'npm install'  // Install dependencies including Snyk
+          bat 'npm install'  // Install dependencies including Snyk
         }
       }
     }
