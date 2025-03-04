@@ -27,7 +27,8 @@ export default defineConfig({
   reporter: [
     ['html', {outputFolder: 'playwright-report'}],          //Build-in HTML reporter 
     ['allure-playwright',{outputFolder: 'allure-results'}], // Allure reporter
-    ['line']
+    ['line'],
+    ['junit', { outputFile: 'playwright-report/results.xml' }]   //JUnit - Azure-compatible
   ],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
