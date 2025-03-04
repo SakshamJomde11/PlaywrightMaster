@@ -1,3 +1,4 @@
+# azure-pipelines.yml
 trigger:
   branches:
     include:
@@ -12,12 +13,12 @@ pr:
       - main
 
 pool:
-  vmImage: 'ubuntu-latest' # Free, uses build minutes within free tier limits (1,800/month for private projects)
+  vmImage: 'ubuntu-latest' # 1 job, free tier
 
 steps:
   - task: NodeTool@0
     inputs:
-      versionSpec: '20.x' # Match your GitHub Actions Node version (20)
+      versionSpec: '20.x'
     displayName: 'Install Node.js'
 
   - script: npm ci
@@ -29,7 +30,7 @@ steps:
   - script: npx playwright test
     displayName: 'Run Playwright tests'
     env:
-      CI: 'true' # Signal CI mode to Playwright
+      CI: 'true'
 
   - task: PublishTestResults@2
     inputs:
