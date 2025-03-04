@@ -1,0 +1,48 @@
+trigger:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - tests/*
+
+pr:
+  branches:
+    include:
+      - main
+
+pool:
+  vmImage: 'ubuntu-latest' # Free, uses build minutes within free tier limits (1,800/month for private projects)
+
+steps:
+  - task: NodeTool@0
+    inputs:
+      versionSpec: '20.x' # Match your GitHub Actions Node version (20)
+    displayName: 'Install Node.js'
+
+  - script: npm ci
+    displayName: 'Install dependencies'
+
+  - script: npx playwright install --with-deps
+    displayName: 'Install Playwright browsers and dependencies'
+
+  - script: npx playwright test
+    displayName: 'Run Playwright tests'
+    env:
+      CI: 'true' # Signal CI mode to Playwright
+
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: 'playwright-report/*.xml'
+      failTaskOnFailedTests: true
+    condition: succeededOrFailed()
+    displayName: 'Publish test results'
+
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: 'playwright-report'
+      artifact: 'playwright-report'
+      publishLocation: 'pipeline'
+    condition: succeededOrFailed()
+    displayName: 'Publish HTML report'
