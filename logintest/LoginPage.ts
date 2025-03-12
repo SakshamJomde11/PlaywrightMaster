@@ -24,7 +24,7 @@ export class LoginPage {
     this.dashboardHeader = page.getByRole('heading', { name: 'Dashboard' });
     this.userMenu = page.locator('.oxd-userdropdown');
     this.logoutButton = page.getByRole('menuitem', { name: 'Logout' });
-  }
+  } 
 
   // Page actions
   async navigateToLoginPage(url: string) {
